@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 
 class APIbuilder:
     
@@ -29,7 +30,7 @@ class APIbuilder:
        URL = 'https://api.hubapi.com/integrations/v1/limit/daily?hapikey='+self.API
        r=requests.get(URL)
        a = r.json()
-       return a
+       print(a)
 ######################################################
 ######################################################
     
@@ -315,8 +316,12 @@ class APIbuilder:
                 options += '&timeOffset='+str(args['Time'])
         URL = 'https://api.hubapi.com/contacts/v1/lists/recently_updated/contacts/recent?hapikey='+self.API +options
         r=requests.get(URL)
-        a = r.json()
-        return a
+        ##Validation of error
+        if r.status_code==200:
+            return r.json()
+        else:
+            time.sleep(5)
+            self.getRecentContacts(args)
    
     def getRecentCompanies(self,args):
         options=''
