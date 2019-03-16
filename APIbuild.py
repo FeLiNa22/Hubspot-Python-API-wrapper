@@ -1,6 +1,5 @@
 import requests
 import json
-import time
 
 class APIbuilder:
     
@@ -93,9 +92,15 @@ class APIbuilder:
             return self.getContact(call,args)
         elif 'update' in function.lower() :
             return self.updateContact(call,args)
-    
+        elif 'merge' in function.lower():
+             return self.mergeContact(call,args)
+         
     def createContact(self,call,args):
         return
+    
+    def mergeContact(self,call,args):
+        if 'byid' in call.lower():
+            return self.mergeContactsbyID(args)
         
     def getContact(self,call,args):
         if 'recent' in call.lower():
@@ -147,6 +152,23 @@ class APIbuilder:
 ######################################################
 
     
+#########################################################################################################################
+#                                                   MERGE FUNCTIONS                                                    #
+#########################################################################################################################
+    def mergeContactsbyID(self,args):
+        # args = {'Main ID': 234324234, 'Secondary IDs':3219887218}
+        if self.checkKey(args,'Main ID') :
+            main_contact= args['Main ID']
+        if self.checkKey(args,'Secondary ID'):
+            secondary_contact= args['Secondary ID']
+        URL = 'https://api.hubapi.com/contacts/v1/contact/merge-vids/'+str(main_contact)+'/?hapikey='+self.API
+        headers = {'content-type':'application/json'}
+        Engagement = {'vidToMerge': secondary_contact}
+        r = requests.post(URL, data = json.dumps(Engagement), headers= headers)
+        if r.status_code == 200:
+            return r
+        else:
+            self.mergeContactsbyID(args)
 #########################################################################################################################
 #                                                   SUBMIT FUNCTIONS                                                    #
 ######################################################################################################################### 
@@ -320,7 +342,6 @@ class APIbuilder:
         if r.status_code==200:
             return r.json()
         else:
-            time.sleep(5)
             self.getRecentContacts(args)
    
     def getRecentCompanies(self,args):
