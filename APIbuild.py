@@ -1,14 +1,25 @@
 import requests
 import json
+import logging
 
 class APIbuilder:
-    
+        
 ######################################################
 ######################################################
     
     def __init__(self,api):
         self.API = api
         self.portalID = self.getPortalId()
+        self.logger = logging.getLogger('APIlog')
+        self.logger.setLevel(logging.DEBUG)
+
+        fh = logging.FileHandler('APIlog.log')
+        fh.setLevel(logging.DEBUG)
+        
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+
+        self.logger.addHandler(fh)
     
     def getPortalId(self):
         URL = 'https://api.hubapi.com/integrations/v1/me?hapikey='+self.API
@@ -168,7 +179,7 @@ class APIbuilder:
         if r.status_code == 200:
             return r
         else:
-            self.mergeContactsbyID(args)
+            self.logger.error('Could not Merge '+str(main_contact) +' With '+ str(secondary_contact))
 #########################################################################################################################
 #                                                   SUBMIT FUNCTIONS                                                    #
 ######################################################################################################################### 
